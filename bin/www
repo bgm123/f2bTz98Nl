@@ -43,6 +43,7 @@ io.sockets.on('connection', function (socket) {
   // Quand le serveur reçoit un signal de type "message" du client
   socket.on('messageChat', function (message) {
     var user = socket.handshake.session.username;
+    "bonjour";
     var d = new Date(),
         m = "0" + d.getMonth(),
         y = d.getFullYear(),
