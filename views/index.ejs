@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %><a href="/">root</a> | <a href="/chat">chat</a></h1>
+    <p>Welcome to <%= title %></p>
+
+    <form action="/cnx" method="post">
+      <p><input type="text" name="username"/></p>
+      <!--<p><input type="text" name="pass"/></p>-->
+      <p><input type="submit" value="Connexion"/></p>
+    </form>
+  </body>
+</html>

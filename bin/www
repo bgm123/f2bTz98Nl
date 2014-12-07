@@ -1,0 +1,61 @@
+#!/usr/bin/env node
+var session = require('express-session');
+var debug = require('debug')('chat');
+var app = require('../app');
+
+var cookie = app.cookieParser("keyboard cat")
+var store = app.store;
+
+app.set('port', process.env.PORT || 3000);
+
+var server = app.listen(app.get('port'), function() {
+  debug('Express server listening on port ' + server.address().port);
+});
+
+var io = require('socket.io').listen(server);
+
+io.use(function(socket, next){
+  var handshake = socket.request;
+
+  cookie(handshake, {}, function(err){
+    //var a = handshake;
+    var sessionID = handshake.signedCookies["express.sid"];
+    store.get(sessionID, function(err, session){
+      if(err || !session){
+        return next(new Error('acces refuser'));
+      }else{
+        socket.handshake.session = session;
+        return next();
+      }
+    })
+  });
+});
+
+io.sockets.on('connection', function (socket) {
+  console.log("User c'est connecté room " + socket.handshake.query.room);
+  socket.join('room' + socket.handshake.query.room);
+
+  socket.on('disconnect', function () {
+    console.log('A socket with sessionID '
+    + ' disconnected!');
+  });
+
+  // Quand le serveur reçoit un signal de type "message" du client
+  socket.on('messageChat', function (message) {
+    var user = socket.handshake.session.username;
+    var d = new Date(),
+        m = "0" + d.getMonth(),
+        y = d.getFullYear(),
+        day = "0" + d.getDate(),
+        h = "0" + d.getHours(),
+        M = "0" + d.getMinutes(),
+        s = "0" + d.getSeconds();
+    var dateStr = y + "-" + m.slice(-2) + "-" + day.slice(-2) + " "
+       + h.slice(-2) + ":" + M.slice(-2) + ":" + s.slice(-2);
+    var data = {user:user,message:message, date:dateStr};
+
+    socket.emit('messageChat', data);
+    socket.in("room"+socket.handshake.query.room).broadcast.emit('messageChat', data);
+  });
+});
+

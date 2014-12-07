@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+<h1><%= title %><a href="/">root</a> | <a href="/chat">chat</a></h1>
+<p>Welcome to <%= title %></p>
+<input type="hidden" name="room" id="room" value="<%= room %>"/>
+<ul id="chatWindow">
+
+</ul>
+    <p><textarea name="message" id="txtMessage"></textarea></p>
+    <p><input type="button" value="Envoyer" id="btnMessage"/></p>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="/javascripts/ejs_0.9_alpha_1_production.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var roomId = $("#room").val();
+        var socket = io('http://localhost:3000',{query:"room="+roomId}).connect();
+
+        $('#btnMessage').click(function () {
+            console.log("btnMessage click()");
+
+            var message = $("#txtMessage").val();
+
+            socket.emit('messageChat', message)
+            $("#txtMessage").val("");
+        })
+
+        socket.on('messageChat', function(data) {
+            html = new EJS({url:'/javascripts/message.ejs'}).render(data);
+            $("#chatWindow").append(html);
+        })
+    </script>
+</body>
+</html>
