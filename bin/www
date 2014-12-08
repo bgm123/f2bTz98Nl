@@ -2,7 +2,7 @@
 var session = require('express-session');
 var debug = require('debug')('chat');
 var app = require('../app');
-var mysql = require("../mysql");
+var mysql = require("../model/mysql");
 
 
 var cookie = app.cookieParser("keyboard cat")
@@ -20,7 +20,6 @@ io.use(function(socket, next){
   var handshake = socket.request;
 
   cookie(handshake, {}, function(err){
-    //var a = handshake;
     var sessionID = handshake.signedCookies["express.sid"];
     store.get(sessionID, function(err, session){
       if(err || !session){
@@ -39,22 +38,7 @@ io.sockets.on('connection', function (socket) {
   console.log("\""+socket.handshake.session.username+"\" c'est connecté room " + socket.handshake.query.room);
   socket.join('room' + socket.handshake.query.room, function(err){
 
-    mysql.pool.getConnection(function(err, cnx){
-      if(err){
-        console.log(err);
-      }else{
-        var sql = "INSERT logcnx(`username`,`room`)VALUES(?,?)";
-        var inserts = [username, room];
-        var query = cnx.format(sql, inserts);
-        cnx.query(query, function(err){
-          if(err){
-            console.log(err);
-          }else {
-            cnx.release();
-          }
-        });
-      }
-    });
+    mysql.logcnx.insertLogCnx(username, room);
   });
 
 

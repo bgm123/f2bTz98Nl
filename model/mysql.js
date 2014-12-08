@@ -10,3 +10,6 @@ var pool = mysql.createPool({
 });
 
 exports.pool = pool;
+
+var logcnx = require("./logcnx");
+exports.logcnx = logcnx;
