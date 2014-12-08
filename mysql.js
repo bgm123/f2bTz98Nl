@@ -2,18 +2,11 @@
  * Created by benoit on 12/7/2014.
  */
 var mysql      = require('mysql');
-var connection = mysql.createConnection({
-    host     : 'localhost',
+var pool = mysql.createPool({
     user     : 'root',
     password : 'root',
-    database : "chat"
+    database : "chat",
+    connectionLimit : 10
 });
-connection.connect(function(err) {
-    if (err) {
-        console.error('error connecting DB: ' + err.stack);
-        return;
-    }
 
-    console.log('connected as id ' + connection.threadId);
-});
-exports.cnx = connection;
+exports.pool = pool;

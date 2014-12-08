@@ -38,11 +38,23 @@ io.sockets.on('connection', function (socket) {
   var room = socket.handshake.query.room;
   console.log("\""+socket.handshake.session.username+"\" c'est connecté room " + socket.handshake.query.room);
   socket.join('room' + socket.handshake.query.room, function(err){
-    var sql = "INSERT logcnx(`username`,`room`)VALUES(??,??)";
-    var inserts = [username, room];
-    var query = mysql.cnx.format(sql, inserts);
 
-    mysql.cnx.query(query);
+    mysql.pool.getConnection(function(err, cnx){
+      if(err){
+        console.log(err);
+      }else{
+        var sql = "INSERT logcnx(`username`,`room`)VALUES(?,?)";
+        var inserts = [username, room];
+        var query = cnx.format(sql, inserts);
+        cnx.query(query, function(err){
+          if(err){
+            console.log(err);
+          }else {
+            cnx.release();
+          }
+        });
+      }
+    });
   });
 
 
