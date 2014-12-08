@@ -8,7 +8,6 @@ var session = require('express-session');
 var uuid = require('node-uuid');
 var store = new session.MemoryStore();
 
-
 var app = express();
 
 // set session for the user

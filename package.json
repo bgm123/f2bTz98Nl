@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "mysql" : "~2.5.3",
     "socket.io" : "~1",
     "connect" : "~1",
     "express": "~4.9.0",

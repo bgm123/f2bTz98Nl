@@ -2,6 +2,8 @@
 var session = require('express-session');
 var debug = require('debug')('chat');
 var app = require('../app');
+var mysql = require("../mysql");
+
 
 var cookie = app.cookieParser("keyboard cat")
 var store = app.store;
@@ -32,8 +34,18 @@ io.use(function(socket, next){
 });
 
 io.sockets.on('connection', function (socket) {
-  console.log("User c'est connecté room " + socket.handshake.query.room);
-  socket.join('room' + socket.handshake.query.room);
+  var username = socket.handshake.session.username;
+  var room = socket.handshake.query.room;
+  console.log("\""+socket.handshake.session.username+"\" c'est connecté room " + socket.handshake.query.room);
+  socket.join('room' + socket.handshake.query.room, function(err){
+    var sql = "INSERT logcnx(`username`,`room`)VALUES(??,??)";
+    var inserts = [username, room];
+    var query = mysql.cnx.format(sql, inserts);
+
+    mysql.cnx.query(query);
+  });
+
+
 
   socket.on('disconnect', function () {
     console.log('A socket with sessionID '
@@ -43,7 +55,6 @@ io.sockets.on('connection', function (socket) {
   // Quand le serveur reçoit un signal de type "message" du client
   socket.on('messageChat', function (message) {
     var user = socket.handshake.session.username;
-    "bonjour";
     var d = new Date(),
         m = "0" + d.getMonth(),
         y = d.getFullYear(),
