@@ -36,6 +36,7 @@ io.sockets.on('connection', function (socket) {
   var username = socket.handshake.session.username;
   var room = socket.handshake.query.room;
   console.log("\""+socket.handshake.session.username+"\" c'est connecté room " + socket.handshake.query.room);
+
   socket.join('room' + socket.handshake.query.room, function(err){
 
     mysql.logcnx.insertLogCnx(username, room);
