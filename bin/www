@@ -32,6 +32,7 @@ io.use(function(socket, next){
   });
 });
 
+// setup socket connection
 io.sockets.on('connection', function (socket) {
   var username = socket.handshake.session.username;
   var room = socket.handshake.query.room;
