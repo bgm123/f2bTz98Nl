@@ -6,13 +6,22 @@
 </head>
 <body>
 <h1><%= title %><a href="/">root</a> | <a href="/chat">chat</a></h1>
-<p>Welcome to <%= title %></p>
-<input type="hidden" name="room" id="room" value="<%= room %>"/>
-<ul id="chatWindow">
-
-</ul>
+<div style="float:left;margin:20px;width:200px;">
+    <ul id="userConnected">
+        <% if(connectedUsers && connectedUsers.length > 0)
+        for(var i = 0; i < connectedUsers.length; i++){ %>
+        <li><a class="user" id="user_<%= connectedUsers[i].username %>" href="#"><%= connectedUsers[i].username %></a></li>
+        <% } else { %><li>none</li><%}%>
+    </ul>
+</div>
+<div style="float:left;">
+    <p>Welcome to <%= title %></p>
+    <input type="hidden" name="room" id="room" value="<%= room %>"/>
+    <ul id="chatWindow">
+    </ul>
     <p><textarea name="message" id="txtMessage"></textarea></p>
     <p><input type="button" value="Envoyer" id="btnMessage"/></p>
+</div>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <script src="/javascripts/ejs_0.9_alpha_1_production.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -30,9 +39,19 @@
         })
 
         socket.on('messageChat', function(data) {
-            html = new EJS({url:'/javascripts/message.ejs'}).render(data);
+            html = new EJS({url:'/javascripts/ejsInclude/message.ejs'}).render(data);
             $("#chatWindow").append(html);
         })
+
+        socket.on('newUser', function(data) {
+            html = new EJS({url:'/javascripts/ejsInclude/userConnected.ejs'}).render(data);
+            $("#userConnected").append(html);
+        })
+
+        socket.on('userDisconnected', function(data) {
+            $("#user_"+data.username).parent("li").remove();
+        })
+
     </script>
 </body>
 </html>
